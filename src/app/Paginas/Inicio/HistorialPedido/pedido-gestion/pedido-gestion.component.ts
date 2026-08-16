@@ -1102,18 +1102,18 @@ export class PedidoGestionComponent {
     this.Filtros['NombreTela'] = '';
 
     const tipoFisico = {
-    CodigoTipoProducto: 1,
-    NombreTipoProducto: 'FISICO'
-  };
+      CodigoTipoProducto: 1,
+      NombreTipoProducto: 'FISICO'
+    };
 
-  this.AplicarSeleccion(
-    'TipoProducto',
-    tipoFisico,
-    this.ProductoTemp,
-    'CodigoTipoProducto',
-    'NombreTipoProducto',
-    'NombreTipoProducto'
-  );
+    this.AplicarSeleccion(
+      'TipoProducto',
+      tipoFisico,
+      this.ProductoTemp,
+      'CodigoTipoProducto',
+      'NombreTipoProducto',
+      'NombreTipoProducto'
+    );
   }
 
   // ==============================
@@ -1291,7 +1291,6 @@ export class PedidoGestionComponent {
           this.CargarPagos();
           this.Procesando = false;
 
-          // 🔥 AQUÍ ESTÁ LO IMPORTANTE
           const codigoPago = resp?.data?.CodigoPago;
 
           if (codigoPago) {
@@ -1537,7 +1536,18 @@ export class PedidoGestionComponent {
       }
 
     } else {
+      payload.MontoPago = (this.MontoPago && this.MontoPago > 0) ? this.MontoPago : (this.Pedido.MontoPago || 0);
       payload.CodigoPedido = this.Codigo;
+    }
+
+    const montoAValidar = (this.MontoPago && this.MontoPago > 0) ? this.MontoPago : (this.Pedido.MontoPago || 0);
+    const saldoPendiente = this.Pedido.Total - montoAValidar;
+    const esEstadoCancelado = this.Pedido.NombreEstadoPedido === 'CANCELADO' || this.Pedido.CodigoEstadoPedido === 5;
+
+    if (esEstadoCancelado && saldoPendiente > 0) {
+      this.AlertaServicio.MostrarAlerta('No se puede Cancelar: todavía tiene saldo pendiente por pagar.');
+      this.Procesando = false;
+      return;
     }
 
     const valorDescuento = (this.Pedido.Subtotal || 0) * ((this.Pedido.Descuento || 0) / 100);
