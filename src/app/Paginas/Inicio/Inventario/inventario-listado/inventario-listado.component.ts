@@ -140,8 +140,6 @@ export class InventarioListadoComponent implements OnInit {
   IniciarArrastre(event: any, index: number) {
     if (this.MostrandoEliminados) return;
 
-    // ❌ QUITAMOS preventDefault() al inicio — eso bloqueaba el scroll
-
     const startX = event.type.startsWith('touch') ? event.touches[0].clientX : event.clientX;
     const startY = event.type.startsWith('touch') ? event.touches[0].clientY : event.clientY;
     const content = event.currentTarget;
@@ -156,22 +154,19 @@ export class InventarioListadoComponent implements OnInit {
       const dx = clientX - startX;
       const dy = clientY - startY;
 
-      // ✅ SI AÚN NO SABEMOS QUÉ TIPO ES → DETECTAMOS
       if (!arrastreDetectado) {
         if (Math.abs(dy) > Math.abs(dx)) {
-          // ⬆️⬇️ ES VERTICAL → DEJAMOS TAL, NO HACEMOS NADA
           return;
         }
         if (Math.abs(dx) > Math.abs(dy)) {
-          // ➡️⬅️ ES HORIZONTAL → ACTIVAMOS ARRASTRE
           arrastreDetectado = true;
           esArrastreHorizontal = true;
         }
       }
 
-      // ✅ SOLO SI ES HORIZONTAL → APLICAMOS TU LÓGICA
+
       if (esArrastreHorizontal) {
-        moveEvent.preventDefault(); // Solo bloqueamos cuando sea arrastre
+        moveEvent.preventDefault(); 
         let desplazamiento = dx;
         if (desplazamiento < 0) desplazamiento = 0;
         if (desplazamiento > 80) desplazamiento = 80;
@@ -183,7 +178,6 @@ export class InventarioListadoComponent implements OnInit {
       const transformX = parseInt(content.style.transform.replace('translateX(', '').replace('px)', '')) || 0;
       content.style.transform = `translateX(0)`;
 
-      // ✅ SOLO EVALUAMOS SI FUE ARRASTRE HORIZONTAL
       if (esArrastreHorizontal && transformX > 60) {
         const producto = this.InventarioFiltrado[index].Producto;
         this.alertaServicio.Confirmacion(
