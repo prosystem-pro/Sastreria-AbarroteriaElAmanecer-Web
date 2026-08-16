@@ -1540,15 +1540,19 @@ export class PedidoGestionComponent {
       payload.CodigoPedido = this.Codigo;
     }
 
-    const montoAValidar = (this.MontoPago && this.MontoPago > 0) ? this.MontoPago : (this.Pedido.MontoPago || 0);
-    const saldoPendiente = this.Pedido.Total - montoAValidar;
-    const esEstadoCancelado = this.Pedido.NombreEstadoPedido === 'CANCELADO' || this.Pedido.CodigoEstadoPedido === 5;
+    // ✅ LEO DIRECTAMENTE EL CAMPO QUE YA VIENE DE LA BD
+    const saldoPendiente = Number(this.Pedido.SaldoPendiente) || 0;
 
-    if (esEstadoCancelado && saldoPendiente > 0) {
+    const esCancelado = this.Pedido.NombreEstadoPedido === 'CANCELADO' || this.Pedido.CodigoEstadoPedido === 5;
+
+    // ✅ SOLO BLOQUEA SI SALDO ES MAYOR A 0
+    if (esCancelado && saldoPendiente > 0) {
       this.AlertaServicio.MostrarAlerta('No se puede Cancelar: todavía tiene saldo pendiente por pagar.');
       this.Procesando = false;
       return;
     }
+
+
 
     const valorDescuento = (this.Pedido.Subtotal || 0) * ((this.Pedido.Descuento || 0) / 100);
     const descuentoAjustado = this.aproximarSegunRegla(valorDescuento);
