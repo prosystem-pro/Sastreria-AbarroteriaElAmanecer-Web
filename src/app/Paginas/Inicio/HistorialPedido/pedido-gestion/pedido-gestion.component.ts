@@ -229,6 +229,22 @@ export class PedidoGestionComponent {
     }
 
     this.CargarCatalogos();
+    setTimeout(() => {
+
+      const tipoFisico = {
+        CodigoTipoProducto: 1,
+        NombreTipoProducto: 'FISICO'
+      };
+
+      this.AplicarSeleccion(
+        'TipoProducto',
+        tipoFisico,
+        this.ProductoTemp,
+        'CodigoTipoProducto',
+        'NombreTipoProducto',
+        'NombreTipoProducto'
+      );
+    }, 100);
   }
   AbrirDatePicker() {
     if (this.dateInput) {
@@ -1084,6 +1100,20 @@ export class PedidoGestionComponent {
     this.Filtros['TipoProducto'] = '';
     this.Filtros['TipoTela'] = '';
     this.Filtros['NombreTela'] = '';
+
+    const tipoFisico = {
+    CodigoTipoProducto: 1,
+    NombreTipoProducto: 'FISICO'
+  };
+
+  this.AplicarSeleccion(
+    'TipoProducto',
+    tipoFisico,
+    this.ProductoTemp,
+    'CodigoTipoProducto',
+    'NombreTipoProducto',
+    'NombreTipoProducto'
+  );
   }
 
   // ==============================
