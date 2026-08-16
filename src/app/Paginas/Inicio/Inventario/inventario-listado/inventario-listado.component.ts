@@ -138,25 +138,50 @@ export class InventarioListadoComponent implements OnInit {
   }
 
   IniciarArrastre(event: any, index: number) {
-    if (this.MostrandoEliminados) return; // no permitir eliminar en eliminados
+    if (this.MostrandoEliminados) return;
+
     event.preventDefault();
+
     const startX = event.type.startsWith('touch') ? event.touches[0].clientX : event.clientX;
+    const startY = event.type.startsWith('touch') ? event.touches[0].clientY : event.clientY;
     const content = event.currentTarget;
+
+    let arrastreHorizontal = false; 
 
     const mover = (moveEvent: any) => {
       const clientX = moveEvent.type.startsWith('touch') ? moveEvent.touches[0].clientX : moveEvent.clientX;
-      let dx = clientX - startX;
-      if (dx < 0) dx = 0;
-      if (dx > 80) dx = 80;
-      content.style.transform = `translateX(${dx}px)`;
+      const clientY = moveEvent.type.startsWith('touch') ? moveEvent.touches[0].clientY : moveEvent.clientY;
+
+      const dx = clientX - startX; 
+      const dy = clientY - startY; 
+
+   
+      if (!arrastreHorizontal && Math.abs(dy) > Math.abs(dx)) {
+        return; 
+      }
+
+
+      if (!arrastreHorizontal && Math.abs(dx) > Math.abs(dy)) {
+        arrastreHorizontal = true;
+      }
+
+      if (arrastreHorizontal) {
+        let desplazamiento = dx;
+        if (desplazamiento < 0) desplazamiento = 0;
+        if (desplazamiento > 80) desplazamiento = 80;
+        content.style.transform = `translateX(${desplazamiento}px)`;
+
+        moveEvent.preventDefault();
+      }
     };
 
     const soltar = () => {
       const transformX = parseInt(content.style.transform.replace('translateX(', '').replace('px)', '')) || 0;
       content.style.transform = `translateX(0)`;
-      if (transformX > 60) {
+
+      if (arrastreHorizontal && transformX > 60) {
         const producto = this.InventarioFiltrado[index].Producto;
-        // USAR ALERTA DE CONFIRMACIÓN
+
         this.alertaServicio.Confirmacion(
           'Confirmar eliminación',
           `¿Desea eliminar el producto "${producto}"?`,
